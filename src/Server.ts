@@ -1,8 +1,10 @@
 import express,{ Request, Response} from 'express'
 import { appendFile } from 'fs'
 import path from 'path'
+const cors = require('cors')
 // import mainRoutes from './routes/Index'
 import {createDBConnection} from './database/Conexao'
+import {Products} from './models/Products'
 
 import dotenv from 'dotenv'
 
@@ -11,6 +13,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 const app=express()
 createDBConnection()
+app.use(cors());
 console.log(process.env.user)
 app.get('/',(req:Request,res:Response)=>{
     res.status(200).send('<h1>hello world</h1>')
@@ -31,7 +34,10 @@ app.get('/users',(req:Request,res:Response)=>{
 ]
 res.status(200).json(users[1])
 })
-
+app.get('/products',cors(), async function  (req, res, next) {
+ let products=await Products.findAll();
+ res.status(200).json(products)
+})
 // app.use(express.static(path.join(__dirname,'../public')))
 // app.use(mainRoutes)
 // app.use((req:Request,res:Response)=>{

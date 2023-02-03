@@ -13,22 +13,34 @@ export interface ProductInstance extends Model{
 }
 
 
-export const Product = sequelizeInstance.define<ProductInstance>('products',{
+export const Products = sequelizeInstance.define<ProductInstance>('products',{
     id:{
         primaryKey:true,
-        type:DataTypes.INTEGER
+        type:DataTypes.INTEGER,
+        allowNull:false
         
     },
     nome:{
-        type:DataTypes.STRING
+        type:DataTypes.STRING,
+        allowNull:false,
+        
     },
     preco:{
-        type:DataTypes.FLOAT
+        type:DataTypes.FLOAT,
+        allowNull:false
     },
     estoque:{
-        type:DataTypes.INTEGER
+        type:DataTypes.INTEGER,
+        allowNull:false,
+        defaultValue:0
     },
     minEstoque:{
-        type:DataTypes.INTEGER
+        type:DataTypes.INTEGER,
+        allowNull:false,
+        defaultValue:0
     }
-})
+},{
+        tableName:'produtos',
+        timestamps:false,
+        
+    })
