@@ -1,12 +1,19 @@
 import express,{ Request, Response} from 'express'
 import { appendFile } from 'fs'
 import path from 'path'
-import mainRoutes from './routes/Index'
+// import mainRoutes from './routes/Index'
+import {createDBConnection} from './database/Conexao'
 
+import dotenv from 'dotenv'
+
+
+
+dotenv.config()
 const app=express()
-
+createDBConnection()
+console.log(process.env.user)
 app.get('/',(req:Request,res:Response)=>{
-    res.status(200).send('<h1> hello world</h1>')
+    res.status(200).send('<h1>hello world</h1>')
 })
 
 
