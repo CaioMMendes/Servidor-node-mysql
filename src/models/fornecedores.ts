@@ -4,16 +4,15 @@ import { Model, DataTypes } from "sequelize";
 import {sequelizeInstance} from '../database/Conexao'
 
 
-export interface ProductInstance extends Model{
+export interface FornecedorInstance extends Model{
     id:number;
     nome:string;
-    preço:number;
-    estoque:number;
-    minEstoue:number;
+    telefone:string;
+
 }
 
 
-export const Products = sequelizeInstance.define<ProductInstance>('products',{
+export const Fornecedores = sequelizeInstance.define<FornecedorInstance>('fornecedores',{
     id:{
         primaryKey:true,
         type:DataTypes.INTEGER,
@@ -25,19 +24,9 @@ export const Products = sequelizeInstance.define<ProductInstance>('products',{
         allowNull:false,
         
     },
-    preco:{
-        type:DataTypes.FLOAT,
-        allowNull:false
-    },
-    estoque:{
-        type:DataTypes.INTEGER,
-        allowNull:false,
-        defaultValue:0
-    },
-    minEstoque:{
-        type:DataTypes.INTEGER,
-        allowNull:false,
-        defaultValue:0
+    telefone:{
+        type:DataTypes.STRING,
+        allowNull:true
     }
 },{
         tableName:'produtos',

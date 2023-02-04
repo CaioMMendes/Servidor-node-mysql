@@ -1,10 +1,11 @@
+import  {Sequelize}  from 'sequelize';
 import express,{ Request, Response} from 'express'
 import { appendFile } from 'fs'
 import path from 'path'
 const cors = require('cors')
 // import mainRoutes from './routes/Index'
-import {createDBConnection} from './database/Conexao'
-import {Products} from './models/Products'
+import {createDBConnection, sequelizeInstance} from './database/Conexao'
+import {Produtos} from './models/Produtos'
 
 import dotenv from 'dotenv'
 
@@ -34,9 +35,24 @@ app.get('/users',(req:Request,res:Response)=>{
 ]
 res.status(200).json(users[1])
 })
-app.get('/products',cors(), async function  (req, res, next) {
- let products=await Products.findAll();
- res.status(200).json(products)
+app.get('/produtos',cors(), async function  (req, res, next) {
+ let produtos=await Produtos.findAll();
+ res.status(200).json(produtos)
+})
+
+
+app.get('/products2',cors(), async function  (req:Request, res:Response, next) {
+ let produtos:any=await sequelizeInstance.query(`select * from produtos `
+      );
+ res.status(200).json(produtos)
+})
+app.get('/products3',cors(), async function  (req:Request, res:Response, next) {
+ let produtos:any=await sequelizeInstance.query(`select f.nome,p.nome,p.preco,p.estoque,p.minEstoque from fornecedor_produto fp,
+ fornecedores f, produtos p where  fp.id_fornecedor=f.id and fp.id_produto=p.id 
+ and fp.id_fornecedor `
+ 
+      );
+ res.status(200).json(produtos)
 })
 // app.use(express.static(path.join(__dirname,'../public')))
 // app.use(mainRoutes)
