@@ -17,7 +17,8 @@ export const Produtos = sequelizeInstance.define<ProdutosInstance>('produtos',{
     id:{
         primaryKey:true,
         type:DataTypes.INTEGER,
-        allowNull:false
+        allowNull:false,
+        autoIncrement:true
         
     },
     nome:{

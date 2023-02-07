@@ -25,7 +25,8 @@ export const CadastroUsuario = sequelizeInstance.define<CadastroUsuarioInstance>
     id:{
         primaryKey:true,
         type:DataTypes.INTEGER,
-        allowNull:false
+        allowNull:false,
+        autoIncrement:true
         
     },
     nome:{

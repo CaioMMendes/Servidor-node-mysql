@@ -6,7 +6,7 @@ const cors = require('cors')
 // import mainRoutes from './routes/Index'
 import {createDBConnection, sequelizeInstance} from './database/Conexao'
 import {Produtos} from './models/Produtos'
-
+import bodyParser from 'body-parser';
 import dotenv from 'dotenv'
 
 
@@ -20,7 +20,7 @@ app.get('/',(req:Request,res:Response)=>{
     res.status(200).send('<h1>hello world</h1>')
 })
 
-
+const router = express.Router();
 
 app.get('/users',(req:Request,res:Response)=>{
    const users=[
@@ -39,11 +39,39 @@ app.get('/produtos',cors(), async function  (req, res, next) {
  let produtos=await Produtos.findAll();
  res.status(200).json(produtos)
 })
+router.post('/produtos', async function  (req, res) {
+ const nome=req.body.nome
+ const preco=req.body.preco
+ const estoque=req.body.estoque
+ const minEstoque=req.body.minEstoque
 
+const produto=Produtos.create({nome,preco,estoque,minEstoque})
+res.status(200).json(produto)
+//  let results:any=await   sequelizeInstance.query(`insert into produtos (nome, preco, estoque,minEstoque) values ('${nome}',${preco},${estoque},${minEstoque})`)
+    //  res.status(200).json(results)
+})
+router.post('/mata-cadeira', async function  (req, res) {
+
+//  let results:any=await   sequelizeInstance.query(`delete from produtos where nome='cadeira'`)
+    let results:any=     await Produtos.destroy({
+  where: {
+    nome: "cadeira"
+  }
+}); res.status(200).json(results)
+
+
+})
+
+
+
+app.use(bodyParser.urlencoded({
+  extended: false
+}));
+app.use(bodyParser.json());
+app.use('/',router)
 
 app.get('/products2',cors(), async function  (req:Request, res:Response, next) {
- let produtos:any=await sequelizeInstance.query(`select * from produtos `
-      );
+ let produtos:any[]=await sequelizeInstance.query(`select p.* from produtos p ;`);
  res.status(200).json(produtos)
 })
 app.get('/products3',cors(), async function  (req:Request, res:Response, next) {

@@ -16,7 +16,8 @@ export const Fornecedores_produto = sequelizeInstance.define<Fornecedor_produtoI
     id:{
         primaryKey:true,
         type:DataTypes.INTEGER,
-        allowNull:false
+        allowNull:false,
+        autoIncrement:true
         
     },
     nome:{
