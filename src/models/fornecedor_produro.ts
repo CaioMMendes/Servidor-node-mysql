@@ -1,36 +1,55 @@
 import { timeStamp } from "console";
 import sequelize from "sequelize";
 import { Model, DataTypes } from "sequelize";
-import {sequelizeInstance} from '../database/Conexao'
 
+import { PassThrough } from "stream";
+import { sequelizeInstance } from "../database/Conexao";
+import { Fornecedores } from "./fornecedores";
+import { Produtos } from "./Produtos";
 
-export interface Fornecedor_produtoInstance extends Model{
-    id:number;
-    id_fornecedor:number;
-    id_produto:number;
-
+export interface Fornecedor_produtoInstance extends Model {
+  id: number;
+  id_produto: number;
+  id_fornecedor: number;
 }
 
+export const Fornecedor_produto =
+  sequelizeInstance.define<Fornecedor_produtoInstance>(
+    "fornecedor_produto",
+    {
+      id: {
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        autoIncrement: true,
+      },
 
-export const Fornecedores_produto = sequelizeInstance.define<Fornecedor_produtoInstance>('fornecedores_produto',{
-    id:{
-        primaryKey:true,
-        type:DataTypes.INTEGER,
-        allowNull:false,
-        autoIncrement:true
-        
+      id_produto: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "produtos",
+          key: "id",
+        },
+      },
+      id_fornecedor: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: "fornecedores",
+          key: "id",
+        },
+      },
     },
-    nome:{
-        type:DataTypes.STRING,
-        allowNull:false,
-        
-    },
-    telefone:{
-        type:DataTypes.STRING,
-        allowNull:false
+    {
+      tableName: "fornecedor_produto",
+      timestamps: false,
     }
-},{
-        tableName:'produtos',
-        timestamps:false,
-        
-    })
+  );
+
+Fornecedores.belongsToMany(Produtos, {
+  through: Fornecedor_produto,
+  foreignKey: "id_fornecedor",
+});
+Produtos.belongsToMany(Fornecedores, {
+  through: Fornecedor_produto,
+  foreignKey: "id_produto",
+});
