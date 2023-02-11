@@ -4,7 +4,7 @@ import { Model, DataTypes } from "sequelize";
 import { sequelizeInstance } from "../database/Conexao";
 import { FornecedorInstance } from "./fornecedores";
 import { Fornecedores } from "./fornecedores";
-import { Fornecedor_produto } from "./fornecedor_produro";
+import { Fornecedor_produto } from "./fornecedor_produto";
 
 export interface ProdutosInstance extends Model {
   addFornecedores(fornecedores: FornecedorInstance): any;

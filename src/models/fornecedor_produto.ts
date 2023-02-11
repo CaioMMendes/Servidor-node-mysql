@@ -5,7 +5,7 @@ import { Model, DataTypes } from "sequelize";
 import { PassThrough } from "stream";
 import { sequelizeInstance } from "../database/Conexao";
 import { Fornecedores } from "./fornecedores";
-import { Produtos } from "./Produtos";
+import { Produtos } from "./produtos";
 
 export interface Fornecedor_produtoInstance extends Model {
   id: number;

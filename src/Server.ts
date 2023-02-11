@@ -1,4 +1,5 @@
-import { Produtos } from "./models/Produtos";
+import { CadastroUsuario } from "./models/cadastro";
+import { Produtos } from "./models/produtos";
 import { Association, Sequelize } from "sequelize";
 import express, { Request, Response } from "express";
 import { appendFile } from "fs";
@@ -6,7 +7,7 @@ import path from "path";
 const cors = require("cors");
 // import mainRoutes from './routes/Index'
 import { createDBConnection, sequelizeInstance } from "./database/Conexao";
-import { Fornecedor_produto } from "./models/fornecedor_produro";
+import { Fornecedor_produto } from "./models/fornecedor_produto";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import { Fornecedores } from "./models/fornecedores";
@@ -89,6 +90,49 @@ router.post("/mata-cadeira", async function (req, res) {
   });
   res.status(200).json(results);
 });
+router.post("/cadastrar", async function (req, res) {
+  //  let results:any=await   sequelizeInstance.query(`delete from produtos where nome='cadeira'`)
+
+  const nome = req.body.nome;
+  const telefone = req.body.telefone;
+  const email = req.body.email;
+  const sexo = req.body.sexo;
+  const localidade = req.body.localidade;
+  const cep = req.body.cep;
+  const logradouro = req.body.logradouro;
+  const uf = req.body.uf;
+  const complemento = req.body.complemento;
+  const numero = req.body.numero;
+  const bairro = req.body.bairro;
+  const pais = req.body.pais;
+
+  const validate = await CadastroUsuario.findOne({
+    where: {
+      email: email,
+    },
+  });
+
+  console.log(validate);
+  if (validate) {
+    res.status(418).json(validate);
+    return;
+  }
+  const results = await CadastroUsuario.create({
+    nome,
+    telefone,
+    email,
+    sexo,
+    localidade,
+    cep,
+    logradouro,
+    uf,
+    complemento,
+    bairro,
+    numero,
+    pais,
+  });
+  res.status(200).json(results);
+});
 
 app.use(
   bodyParser.urlencoded({
@@ -105,7 +149,7 @@ app.get(
     let produtos: any[] = await sequelizeInstance.query(
       `select p.* from produtos p ;`
     );
-    res.status(200).json(produtos);
+    res.json(produtos);
   }
 );
 app.get(
