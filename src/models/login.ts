@@ -3,8 +3,9 @@ import { sequelizeInstance } from "../database/Conexao";
 
 export interface loginUserInstance extends Model {
   id: number;
-  username: string;
+  email: string;
   password: string;
+  name: string;
 }
 
 export const loginUser = sequelizeInstance.define<loginUserInstance>(
@@ -16,12 +17,16 @@ export const loginUser = sequelizeInstance.define<loginUserInstance>(
       allowNull: false,
       autoIncrement: true,
     },
-    username: {
+    email: {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
     },
     password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
     },

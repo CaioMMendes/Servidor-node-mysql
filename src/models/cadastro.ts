@@ -1,5 +1,3 @@
-import { timeStamp } from "console";
-import sequelize from "sequelize";
 import { Model, DataTypes } from "sequelize";
 import { sequelizeInstance } from "../database/Conexao";
 

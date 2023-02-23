@@ -11,6 +11,8 @@ import { Fornecedor_produto } from "./models/fornecedor_produto";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import { Fornecedores } from "./models/fornecedores";
+import { loginUser } from "./models/login";
+const bcrypt = require("bcrypt");
 
 dotenv.config();
 const app = express();
@@ -133,12 +135,58 @@ router.post("/cadastrar", async function (req, res) {
   });
   res.status(200).json(results);
 });
+router.post("/register", async function (req, res) {
+  //  let results:any=await   sequelizeInstance.query(`delete from produtos where nome='cadeira'`)
+
+  const email = req.body.email;
+  const password = await bcrypt.hash(req.body.password, 10);
+  const name = req.body.name;
+
+  const validate = await loginUser.findOne({
+    where: {
+      email,
+    },
+  });
+
+  console.log(validate);
+  if (validate) {
+    console.log(validate);
+    res.status(418).json({ email: validate.email });
+    return;
+  }
+  const results = await loginUser.create({
+    email,
+    password,
+    name,
+  });
+  res.json(results);
+});
 
 app.use(
   bodyParser.urlencoded({
     extended: false,
   })
 );
+
+router.post("/login", async function (req: Request, res: Response) {
+  const email = req.body.email;
+  const password = req.body.password;
+  const validate = await loginUser.findOne({
+    where: {
+      email,
+    },
+  });
+
+  if (validate) {
+    if (await bcrypt.compare(password, validate.password)) {
+      res.json({ name: validate.name, email: validate.email });
+      return;
+    } else {
+      res.status(418).json(false);
+    }
+  } else res.status(418).json(false);
+});
+
 app.use(bodyParser.json());
 app.use("/", router);
 
