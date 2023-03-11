@@ -4,7 +4,6 @@ import { Association, Sequelize } from "sequelize";
 import express, { Request, Response } from "express";
 import { appendFile } from "fs";
 import path from "path";
-const cors = require("cors");
 // import mainRoutes from './routes/Index'
 import { createDBConnection, sequelizeInstance } from "./database/Conexao";
 import { Fornecedor_produto } from "./models/fornecedor_produto";
@@ -12,17 +11,16 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import { Fornecedores } from "./models/fornecedores";
 import { loginUser } from "./models/login";
+import { verifyJWT } from "./middleware/verifyJWT";
+const cors = require("cors");
 const bcrypt = require("bcrypt");
-
+const jwt = require("jsonwebtoken");
 dotenv.config();
 const app = express();
 createDBConnection();
 Fornecedor_produto.length; //É só pra inicializar esse arquivo, se quiser fazer sem isso copiar o final belongtomany para o arquivo de Produtos
 app.use(cors());
 console.log(process.env.user);
-app.get("/", (req: Request, res: Response) => {
-  res.status(200).send("<h1>hello world</h1>");
-});
 
 const router = express.Router();
 
@@ -179,14 +177,41 @@ router.post("/login", async function (req: Request, res: Response) {
 
   if (validate) {
     if (await bcrypt.compare(password, validate.password)) {
-      res.json({ name: validate.name, email: validate.email });
+      const acessToken = jwt.sign(
+        { id: validate.id },
+        process.env.ACESS_TOKEN_SECRET,
+        { expiresIn: "30s" }
+      );
+      const refreshToken = jwt.sign(
+        { id: validate.id },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: "30d" }
+      );
+      await loginUser.update({ token: refreshToken }, { where: { email } });
+      res.cookie("jwt", refreshToken, {
+        httpOnly: true,
+        maxAge: 1 * 24 * 60 * 60 * 1000,
+      });
+      res.json({
+        name: validate.name,
+        email: validate.email,
+        token: acessToken,
+      });
+
       return;
     } else {
       res.status(418).json(false);
     }
   } else res.status(418).json(false);
 });
-
+router.post("/userinfo", verifyJWT, async (req: any, res: Response) => {
+  let user: any = await loginUser.findOne({
+    where: {
+      id: req.id,
+    },
+  });
+  res.json(user);
+});
 app.use(bodyParser.json());
 app.use("/", router);
 

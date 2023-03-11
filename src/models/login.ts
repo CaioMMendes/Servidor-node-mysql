@@ -30,6 +30,11 @@ export const loginUser = sequelizeInstance.define<loginUserInstance>(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    token: {
+      type: DataTypes.JSON,
+
+      unique: true,
+    },
   },
   {
     tableName: "login",
