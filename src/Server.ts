@@ -12,18 +12,22 @@ import dotenv from "dotenv";
 import { Fornecedores } from "./models/fornecedores";
 import { loginUser } from "./models/login";
 import { verifyJWT } from "./middleware/verifyJWT";
+import { handleRefreshToken } from "./controllers/refreshTokenController";
+
+const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const router = express.Router();
 dotenv.config();
 const app = express();
+app.use(cookieParser());
 createDBConnection();
+app.use(bodyParser.json());
+
 Fornecedor_produto.length; //É só pra inicializar esse arquivo, se quiser fazer sem isso copiar o final belongtomany para o arquivo de Produtos
 app.use(cors());
-console.log(process.env.user);
-
-const router = express.Router();
-
+app.use("/", router);
 app.get("/users", (req: Request, res: Response) => {
   const users = [
     {
@@ -180,7 +184,7 @@ router.post("/login", async function (req: Request, res: Response) {
       const acessToken = jwt.sign(
         { id: validate.id },
         process.env.ACESS_TOKEN_SECRET,
-        { expiresIn: "30s" }
+        { expiresIn: "3000s" }
       );
       const refreshToken = jwt.sign(
         { id: validate.id },
@@ -190,6 +194,10 @@ router.post("/login", async function (req: Request, res: Response) {
       await loginUser.update({ token: refreshToken }, { where: { email } });
       res.cookie("jwt", refreshToken, {
         httpOnly: true,
+
+        sameSite: "none",
+
+        // secure: true,
         maxAge: 1 * 24 * 60 * 60 * 1000,
       });
       res.json({
@@ -207,13 +215,13 @@ router.post("/login", async function (req: Request, res: Response) {
 router.post("/userinfo", verifyJWT, async (req: any, res: Response) => {
   let user: any = await loginUser.findOne({
     where: {
+      //esse id sai da criptografia que eu coloquei no jwt ai quando ta certo o token retorna o id
       id: req.id,
     },
   });
   res.json(user);
 });
-app.use(bodyParser.json());
-app.use("/", router);
+router.post("/refresh", handleRefreshToken);
 
 app.get(
   "/products2",

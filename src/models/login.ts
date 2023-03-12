@@ -31,7 +31,7 @@ export const loginUser = sequelizeInstance.define<loginUserInstance>(
       allowNull: false,
     },
     token: {
-      type: DataTypes.JSON,
+      type: DataTypes.STRING,
 
       unique: true,
     },
