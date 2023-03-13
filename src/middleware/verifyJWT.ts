@@ -10,7 +10,7 @@ export const verifyJWT = (req: any, res: any, next: any) => {
   const token = authHeader.split(" ")[1];
   jwt.verify(
     token,
-    process.env.ACESS_TOKEN_SECRET,
+    process.env.ACCESS_TOKEN_SECRET,
 
     (err: Error, decoded: any) => {
       if (err) return res.sendStatus(403);

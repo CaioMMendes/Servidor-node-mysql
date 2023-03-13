@@ -7,7 +7,7 @@ app.use(cookieParser());
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-export const handleRefreshToken = async (req: any, res: any) => {
+export const refreshTokenController = async (req: any, res: any) => {
   const cookies = req.cookies;
   console.log(req.body);
   console.log(cookies);
@@ -28,12 +28,12 @@ export const handleRefreshToken = async (req: any, res: any) => {
     process.env.REFRESH_TOKEN_SECRET,
     (err: any, decoded: any) => {
       if (err || user.id !== decoded.id) return res.sendStatus(403);
-      const acessToken = jwt.sign(
+      const accessToken = jwt.sign(
         { id: decoded.id },
-        process.env.ACESS_TOKEN_SECRET,
+        process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: "30s" }
       );
-      res.json({ acessToken });
+      res.json({ accessToken });
     }
   );
 };
