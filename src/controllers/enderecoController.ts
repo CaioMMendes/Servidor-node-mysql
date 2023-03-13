@@ -1,14 +1,7 @@
 import { Request, Response } from "express";
 
 import { CadastroUsuario } from "../models/cadastro";
-// import bodyParser from "body-parser";
-// const app = express();
-// app.use(bodyParser.json());
-// app.use(
-//   bodyParser.urlencoded({
-//     extended: false,
-//   })
-// );
+
 
 
 export const cadastrar= async function (req:Request, res:Response) {

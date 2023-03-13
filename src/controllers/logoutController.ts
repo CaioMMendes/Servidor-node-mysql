@@ -7,9 +7,9 @@ app.use(cookieParser());
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-export const logoutController = async (req: any, res: any) => {
+export const logoutController = async (req: Request, res: Response) => {
   const cookies = req.cookies;
-  console.log(req.body);
+
   console.log(cookies);
   if (!cookies?.jwt) return res.sendStatus(204);
   const refreshToken = cookies.jwt;

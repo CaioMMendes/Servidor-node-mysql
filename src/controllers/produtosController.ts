@@ -1,5 +1,5 @@
 
-import { createDBConnection, sequelizeInstance } from "../database/Conexao";
+import {  sequelizeInstance } from "../database/Conexao";
 import { Request, Response } from "express";
 import { Produtos } from "../models/produtos";
 export const products2=  async function (req: Request, res: Response, next:any) {

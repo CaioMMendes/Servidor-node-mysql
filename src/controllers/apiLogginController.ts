@@ -1,18 +1,9 @@
-import { Request,Response } from "express";
+import { Request, Response } from "express";
 import { loginUser } from "../models/login";
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
-
-
-
-
-
-
-
-
-
-export const login= async function (req: Request, res: Response) {
+export const login = async function (req: Request, res: Response) {
   const email = req.body.email;
   const password = req.body.password;
   const validate = await loginUser.findOne({
@@ -53,11 +44,9 @@ export const login= async function (req: Request, res: Response) {
       res.status(418).json(false);
     }
   } else res.status(418).json(false);
-}
+};
 
-
-
-export const register=async function (req:Request, res:Response) {
+export const register = async function (req: Request, res: Response) {
   //  let results:any=await   sequelizeInstance.query(`delete from produtos where nome='cadeira'`)
 
   const email = req.body.email;
@@ -76,16 +65,29 @@ export const register=async function (req:Request, res:Response) {
     res.status(418).json({ email: validate.email });
     return;
   }
+
   const results = await loginUser.create({
     email,
     password,
     name,
   });
+
+  //todo- insere um refresh token no banco quando o usuario é cadastrado
+  //todo- deixei comentando porque acho melhor só cadastrar esse token quando a pessoa logar a primeira vez
+  // const refreshToken = jwt.sign(
+  //   { id: results.id },
+  //   process.env.REFRESH_TOKEN_SECRET,
+  //   { expiresIn: "30d" }
+  // );
+  // const insertTokenDb = await loginUser.update(
+  //   { token: refreshToken },
+  //   { where: { id: results.id } }
+  // );
+
   res.json(results);
-}
+};
 
-
-export const userInfo= async (req: any, res: Response) => {
+export const userInfo = async (req: any, res: Response) => {
   let user: any = await loginUser.findOne({
     where: {
       //esse id sai da criptografia que eu coloquei no jwt ai quando ta certo o token retorna o id
@@ -93,6 +95,4 @@ export const userInfo= async (req: any, res: Response) => {
     },
   });
   res.json(user);
-}
-
-
+};

@@ -35,13 +35,7 @@ export const fornecedor= async function (req: Request, res: Response) {
     },
     { include: Produtos }
   );
-  // const produtos = await Produtos.create({
-  //   nome: "cadeiira",
-  //   preco: 20,
-  //   estoque: 3,
-  //   minEstoque: 1,
-  // });
-  // await produtos.addFornecedores(fornecedores);
+
 
   res.status(200).json(fornecedores);
 }
