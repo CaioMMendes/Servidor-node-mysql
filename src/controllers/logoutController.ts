@@ -10,10 +10,10 @@ require("dotenv").config();
 export const logoutController = async (req: Request, res: Response) => {
   const cookies = req.cookies;
 
-  console.log(cookies);
+  console.log(cookies?.jwt);
   if (!cookies?.jwt) return res.sendStatus(204);
   const refreshToken = cookies.jwt;
-  console.log(refreshToken);
+
   const user: any = await loginUser.findOne({
     where: {
       token: refreshToken,
@@ -25,7 +25,7 @@ export const logoutController = async (req: Request, res: Response) => {
     res.clearCookie("jwt", {
       httpOnly: true,
 
-      sameSite: "none",
+      // sameSite: "none",
 
       // secure: true,
     });
@@ -39,7 +39,7 @@ export const logoutController = async (req: Request, res: Response) => {
   res.clearCookie("jwt", {
     httpOnly: true,
 
-    sameSite: "none",
+    // sameSite: "none",
 
     // secure: true - only serves on https - para aplicações reais usar isso
   });

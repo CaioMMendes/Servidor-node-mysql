@@ -25,14 +25,17 @@ export const login = async function (req: Request, res: Response) {
         { expiresIn: "30d" }
       );
       await loginUser.update({ token: refreshToken }, { where: { email } });
+
+      console.log("login");
       res.cookie("jwt", refreshToken, {
         httpOnly: true,
 
-        sameSite: "none",
+        // sameSite: "none",
 
-        // secure: true,
-        maxAge: 1 * 24 * 60 * 60 * 1000,
+        // secure: false, //true para requisições de sites https
+        maxAge: 25 * 24 * 60 * 60 * 1000,
       });
+      console.log(refreshToken);
       res.json({
         name: validate.name,
         email: validate.email,
@@ -59,9 +62,7 @@ export const register = async function (req: Request, res: Response) {
     },
   });
 
-  console.log(validate);
   if (validate) {
-    console.log(validate);
     res.status(418).json({ email: validate.email });
     return;
   }
@@ -95,4 +96,10 @@ export const userInfo = async (req: any, res: Response) => {
     },
   });
   res.json(user);
+};
+
+export const uploadAvatarImg = async (req: Request, res: Response) => {
+  console.log(req.file);
+
+  res.json({});
 };
