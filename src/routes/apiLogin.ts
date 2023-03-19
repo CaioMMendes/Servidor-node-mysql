@@ -4,14 +4,28 @@ import * as apiController from "../controllers/apiLogginController";
 import { refreshTokenController } from "../controllers/refreshTokenController";
 import { logoutController } from "../controllers/logoutController";
 import multer from "multer";
+const crypto = require("crypto");
+import { Hash } from "crypto";
 const router = Router();
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./temp");
+  },
+  filename: (req, file, cb) => {
+    crypto.randomBytes(16, (err: any, hash: any) => {
+      // if (err) cb(err); Tá dando erro de expected 2 arguments but got 1
+      const filename = `${hash.toString("hex")}-${file.originalname}`;
+      cb(null, filename);
+    });
+  },
+});
 const upload = multer({
-  dest: "./temp",
+  storage: storage,
   fileFilter: (req, file, cb) => {
     const allowed: string = "image/";
-    console.log(file.mimetype);
     cb(null, file.mimetype.includes(allowed));
   },
+  limits: { fieldSize: 10485760 },
 });
 router.post("/login", apiController.login);
 router.post("/register", apiController.register);

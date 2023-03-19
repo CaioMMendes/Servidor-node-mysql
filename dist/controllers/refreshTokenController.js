@@ -23,14 +23,15 @@ const refreshTokenController = async (req, res) => {
             token: refreshToken,
         },
     });
-    console.log(user);
+    console.log(user, "refresh Token");
     if (!user)
         return res.sendStatus(403); //forbiden
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
         if (err || user.id !== decoded.id)
             return res.sendStatus(403);
-        const accessToken = jwt.sign({ id: decoded.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "30s" });
-        res.json({ accessToken });
+        const accessToken = jwt.sign({ id: decoded.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
+        console.log("novo Token ", accessToken);
+        res.json({ accessToken: accessToken });
     });
 };
 exports.refreshTokenController = refreshTokenController;

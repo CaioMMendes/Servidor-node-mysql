@@ -35,7 +35,7 @@ const logoutController = async (req, res) => {
     await login_1.loginUser.update({ token: null }, { where: { token: refreshToken } });
     res.clearCookie("jwt", {
         httpOnly: true,
-        sameSite: "none",
+        // sameSite: "none",
         // secure: true - only serves on https - para aplicações reais usar isso
     });
     res.sendStatus(204);

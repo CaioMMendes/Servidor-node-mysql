@@ -1,11 +1,15 @@
 import { Request, Response } from "express";
 import { loginUser } from "../models/login";
+import { unlink } from "fs/promises";
+import { createFile, updateFile, deleteFile } from "../controllers/driveUpload";
+
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 export const login = async function (req: Request, res: Response) {
   const email = req.body.email;
   const password = req.body.password;
+  const isChecked = req.body.isChecked;
   const validate = await loginUser.findOne({
     where: {
       email,
@@ -17,7 +21,7 @@ export const login = async function (req: Request, res: Response) {
       const accessToken = jwt.sign(
         { id: validate.id },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "30s" }
+        { expiresIn: "15m" }
       );
       const refreshToken = jwt.sign(
         { id: validate.id },
@@ -27,14 +31,17 @@ export const login = async function (req: Request, res: Response) {
       await loginUser.update({ token: refreshToken }, { where: { email } });
 
       console.log("login");
-      res.cookie("jwt", refreshToken, {
-        httpOnly: true,
+      if (isChecked) {
+        res.cookie("jwt", refreshToken, {
+          httpOnly: true,
 
-        // sameSite: "none",
+          // sameSite: "none",
 
-        // secure: false, //true para requisições de sites https
-        maxAge: 25 * 24 * 60 * 60 * 1000,
-      });
+          // secure: false, //true para requisições de sites https
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+        });
+      }
+
       console.log(refreshToken);
       res.json({
         name: validate.name,
@@ -85,7 +92,7 @@ export const register = async function (req: Request, res: Response) {
   //   { where: { id: results.id } }
   // );
 
-  res.json(results);
+  res.json(results.id);
 };
 
 export const userInfo = async (req: any, res: Response) => {
@@ -95,11 +102,37 @@ export const userInfo = async (req: any, res: Response) => {
       id: req.id,
     },
   });
+  console.log("entrou no user info");
   res.json(user);
 };
 
 export const uploadAvatarImg = async (req: Request, res: Response) => {
-  console.log(req.file);
+  console.log("entrou avatar img");
+  if (req.file) {
+    console.log(req.file);
+    const userId = req.body.userId;
+    let imageId = "";
 
-  res.json({});
+    await createFile(req.file).then((data: any) => {
+      console.log(data);
+      imageId = data;
+    });
+
+    // await deleteFile("18_ZuYgt3Z5MKaGAUAlBJjm809BgLvcW2");
+    // await updateFile("1a-g9YCzQC1-TBznCFhVcNBfgxjVyFt5b", req.file.path);
+
+    const updateImageDb = await loginUser.update(
+      {
+        avatarId: req.file,
+      },
+      { where: { id: userId } }
+    );
+
+    //Para deletar o arquivo usa o unlink
+    await unlink(req.file.path);
+    res.json({});
+  } else {
+    res.sendStatus(400);
+    res.json({ error: "Arquivo inválido" });
+  }
 };

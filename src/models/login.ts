@@ -32,7 +32,14 @@ export const loginUser = sequelizeInstance.define<loginUserInstance>(
     },
     token: {
       type: DataTypes.STRING,
-
+      unique: true,
+    },
+    googleId: {
+      type: DataTypes.STRING,
+      unique: true,
+    },
+    avatarId: {
+      type: DataTypes.STRING,
       unique: true,
     },
   },

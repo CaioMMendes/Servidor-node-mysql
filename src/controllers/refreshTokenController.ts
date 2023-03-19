@@ -19,7 +19,7 @@ export const refreshTokenController = async (req: Request, res: Response) => {
       token: refreshToken,
     },
   });
-  console.log(user);
+  console.log(user, "refresh Token");
 
   if (!user) return res.sendStatus(403); //forbiden
 
@@ -31,9 +31,10 @@ export const refreshTokenController = async (req: Request, res: Response) => {
       const accessToken = jwt.sign(
         { id: decoded.id },
         process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "30s" }
+        { expiresIn: "15m" }
       );
-      res.json({ accessToken });
+      console.log("novo Token ", accessToken);
+      res.json({ accessToken: accessToken });
     }
   );
 };
