@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadAvatarImg = exports.userInfo = exports.register = exports.login = void 0;
 const login_1 = require("../models/login");
-const promises_1 = require("fs/promises");
 const driveUpload_1 = require("../controllers/driveUpload");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -20,7 +19,6 @@ const login = async function (req, res) {
             const accessToken = jwt.sign({ id: validate.id }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "15m" });
             const refreshToken = jwt.sign({ id: validate.id }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "30d" });
             await login_1.loginUser.update({ token: refreshToken }, { where: { email } });
-            console.log("login");
             if (isChecked) {
                 res.cookie("jwt", refreshToken, {
                     httpOnly: true,
@@ -29,7 +27,6 @@ const login = async function (req, res) {
                     maxAge: 30 * 24 * 60 * 60 * 1000,
                 });
             }
-            console.log(refreshToken);
             res.json({
                 name: validate.name,
                 email: validate.email,
@@ -75,7 +72,7 @@ const register = async function (req, res) {
     //   { token: refreshToken },
     //   { where: { id: results.id } }
     // );
-    res.json(results);
+    res.json(results.id);
 };
 exports.register = register;
 const userInfo = async (req, res) => {
@@ -85,22 +82,32 @@ const userInfo = async (req, res) => {
             id: req.id,
         },
     });
-    console.log("entrou no user info");
     res.json(user);
 };
 exports.userInfo = userInfo;
 const uploadAvatarImg = async (req, res) => {
+    console.log("entrou avatar img");
     if (req.file) {
         console.log(req.file);
-        await (0, driveUpload_1.uploadFile)(req.file).then((data) => {
+        const userId = req.body.userId;
+        let imageId = "";
+        await (0, driveUpload_1.createFile)(req.file).then((data) => {
             console.log(data);
+            imageId = data.id;
         });
+        // await deleteFile("18_ZuYgt3Z5MKaGAUAlBJjm809BgLvcW2");
+        // await updateFile("1a-g9YCzQC1-TBznCFhVcNBfgxjVyFt5b", req.file.path);
+        const updateImageDb = await login_1.loginUser.update({
+            avatarId: imageId,
+        }, 
+        // { where: { id: 122 } }
+        { where: { id: userId } });
         //Para deletar o arquivo usa o unlink
-        await (0, promises_1.unlink)(req.file.path);
+        // await unlink(req.file.path);
         res.json({});
     }
     else {
-        res.sendStatus(400);
+        res.status(400);
         res.json({ error: "Arquivo inválido" });
     }
 };

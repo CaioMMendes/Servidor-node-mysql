@@ -41,6 +41,8 @@ const storage = multer_1.default.diskStorage({
     filename: (req, file, cb) => {
         crypto.randomBytes(16, (err, hash) => {
             // if (err) cb(err); Tá dando erro de expected 2 arguments but got 1
+            // const filename = `${hash.toString("hex")}-${req.name}`;
+            // const filename = `${hash.toString("hex")}-${file.name}`;
             const filename = `${hash.toString("hex")}-${file.originalname}`;
             cb(null, filename);
         });
@@ -50,9 +52,11 @@ const upload = (0, multer_1.default)({
     storage: storage,
     fileFilter: (req, file, cb) => {
         const allowed = "image/";
+        // cb(null, file.type.includes(allowed));
         cb(null, file.mimetype.includes(allowed));
+        // cb(null, req.type.includes(allowed));
     },
-    limits: { fieldSize: 10485760 },
+    limits: { fieldSize: 10485760, fileSize: 10485760 },
 });
 router.post("/login", apiController.login);
 router.post("/register", apiController.register);

@@ -30,7 +30,6 @@ export const login = async function (req: Request, res: Response) {
       );
       await loginUser.update({ token: refreshToken }, { where: { email } });
 
-      console.log("login");
       if (isChecked) {
         res.cookie("jwt", refreshToken, {
           httpOnly: true,
@@ -42,7 +41,6 @@ export const login = async function (req: Request, res: Response) {
         });
       }
 
-      console.log(refreshToken);
       res.json({
         name: validate.name,
         email: validate.email,
@@ -102,12 +100,13 @@ export const userInfo = async (req: any, res: Response) => {
       id: req.id,
     },
   });
-  console.log("entrou no user info");
+
   res.json(user);
 };
 
-export const uploadAvatarImg = async (req: Request, res: Response) => {
+export const uploadAvatarImg = async (req: any, res: Response) => {
   console.log("entrou avatar img");
+
   if (req.file) {
     console.log(req.file);
     const userId = req.body.userId;
@@ -115,7 +114,8 @@ export const uploadAvatarImg = async (req: Request, res: Response) => {
 
     await createFile(req.file).then((data: any) => {
       console.log(data);
-      imageId = data;
+
+      imageId = data.id;
     });
 
     // await deleteFile("18_ZuYgt3Z5MKaGAUAlBJjm809BgLvcW2");
@@ -123,16 +123,18 @@ export const uploadAvatarImg = async (req: Request, res: Response) => {
 
     const updateImageDb = await loginUser.update(
       {
-        avatarId: req.file,
+        avatarId: imageId,
       },
+      // { where: { id: 122 } }
       { where: { id: userId } }
     );
 
     //Para deletar o arquivo usa o unlink
-    await unlink(req.file.path);
+    // await unlink(req.file.path);
     res.json({});
   } else {
-    res.sendStatus(400);
+    res.status(400);
+
     res.json({ error: "Arquivo inválido" });
   }
 };

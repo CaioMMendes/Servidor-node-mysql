@@ -23,34 +23,36 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.uploadFile = void 0;
+exports.updateFile = exports.deleteFile = exports.createFile = void 0;
 const googleapis_1 = require("googleapis");
 const fs = require("fs");
 const dotenv = __importStar(require("dotenv"));
 dotenv.config();
-const uploadFile = async (req) => {
-    const config = {
-        type: process.env.type,
-        project_id: process.env.project_id,
-        private_key_id: process.env.private_key_id,
-        private_key: process.env.private_key,
-        client_email: process.env.client_email,
-        client_id: process.env.client_id,
-        auth_uri: process.env.auth_uri,
-        token_uri: process.env.token_uri,
-        auth_provider_x509_cert_url: process.env.auth_provider_x509_cert_url,
-        client_x509_cert_url: process.env.client_x509_cert_url,
-    };
-    const configString = JSON.stringify(config);
+const credentials = {
+    type: process.env.TYPE,
+    project_id: process.env.PROJECT_ID,
+    private_key_id: process.env.PRIVATE_KEY_ID,
+    private_key: process.env.PRIVATE_KEY,
+    client_email: process.env.CLIENT_EMAIL,
+    client_id: process.env.CLIENT_ID,
+    auth_uri: "https://accounts.google.com/o/oauth2/auth",
+    token_uri: "https://oauth2.googleapis.com/token",
+    auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+    client_x509_cert_url: "https://www.googleapis.com/robot/v1/metadata/x509/google-drive%40learning-cloud-381017.iam.gserviceaccount.com",
+};
+const auth = new googleapis_1.google.auth.GoogleAuth({
+    //   keyFile: `${keyFile}`,
+    //   credentials: credentials,
+    keyFile: "./googleDrive.json",
+    scopes: ["https://www.googleapis.com/auth/drive"],
+});
+const driveService = googleapis_1.google.drive({
+    version: "v3",
+    auth,
+});
+const createFile = async (req) => {
+    const keyFile = JSON.stringify(credentials);
     try {
-        const auth = new googleapis_1.google.auth.GoogleAuth({
-            keyFile: configString,
-            scopes: ["https://www.googleapis.com/auth/drive"],
-        });
-        const driveService = googleapis_1.google.drive({
-            version: "v3",
-            auth,
-        });
         const fileMetaData = {
             name: req.filename,
             parents: [process.env.GOOGLE_FOLDER_ID],
@@ -59,19 +61,35 @@ const uploadFile = async (req) => {
             mimeType: "image/*",
             body: fs.createReadStream(`./${req.path}`),
         };
-        const params = {
+        const paramsCreate = {
             requestBody: fileMetaData,
             media: media,
             fields: "id",
         };
-        const response = await driveService.files.create(params);
-        return response.data.id;
+        const create = await driveService.files.create(paramsCreate);
+        return create.data;
     }
     catch (err) {
         console.log("Erro criando o arquivo", err);
     }
 };
-exports.uploadFile = uploadFile;
+exports.createFile = createFile;
 //https://drive.google.com/uc?export=view&id=
 //link com id na frente para visualizar a imagem
+const deleteFile = async (fileId) => {
+    const deletefile = await driveService.files.delete({
+        fileId: fileId,
+    });
+};
+exports.deleteFile = deleteFile;
+const updateFile = async (fileId, fileContent) => {
+    const update = await driveService.files.update({
+        fileId: fileId,
+        media: {
+            mimeType: "image/*",
+            body: fs.createReadStream(`./${fileContent}`),
+        },
+    });
+};
+exports.updateFile = updateFile;
 //# sourceMappingURL=driveUpload.js.map

@@ -24,9 +24,10 @@ const app = (0, express_1.default)();
 app.use(credentials_1.credentials);
 app.use(cookieParser());
 (0, Conexao_1.createDBConnection)();
-app.use(body_parser_1.default.json());
+app.use(body_parser_1.default.json({ limit: "10mb" }));
 app.use(body_parser_1.default.urlencoded({
-    extended: false,
+    limit: "10mb",
+    extended: true,
 }));
 fornecedor_produto_1.Fornecedor_produto.length; //É só pra inicializar esse arquivo, se quiser fazer sem isso copiar o final belongtomany para o arquivo de Produtos
 app.use(cors(corsOptions_1.corsOptions));

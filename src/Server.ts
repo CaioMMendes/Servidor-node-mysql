@@ -22,10 +22,11 @@ const app = express();
 app.use(credentials);
 app.use(cookieParser());
 createDBConnection();
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: "10mb" }));
 app.use(
   bodyParser.urlencoded({
-    extended: false,
+    limit: "10mb",
+    extended: true,
   })
 );
 Fornecedor_produto.length; //É só pra inicializar esse arquivo, se quiser fazer sem isso copiar o final belongtomany para o arquivo de Produtos

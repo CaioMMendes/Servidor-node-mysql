@@ -27,6 +27,14 @@ exports.loginUser = Conexao_1.sequelizeInstance.define("loginUser", {
         type: sequelize_1.DataTypes.STRING,
         unique: true,
     },
+    googleId: {
+        type: sequelize_1.DataTypes.STRING,
+        unique: true,
+    },
+    avatarId: {
+        type: sequelize_1.DataTypes.STRING,
+        unique: true,
+    },
 }, {
     tableName: "login",
     timestamps: false,
