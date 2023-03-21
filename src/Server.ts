@@ -29,6 +29,7 @@ app.use(
     extended: true,
   })
 );
+
 Fornecedor_produto.length; //É só pra inicializar esse arquivo, se quiser fazer sem isso copiar o final belongtomany para o arquivo de Produtos
 app.use(cors(corsOptions));
 app.use("/", router);

@@ -130,7 +130,7 @@ export const uploadAvatarImg = async (req: any, res: Response) => {
     );
 
     //Para deletar o arquivo usa o unlink
-    // await unlink(req.file.path);
+    await unlink(req.file.path);
     res.json({});
   } else {
     res.status(400);

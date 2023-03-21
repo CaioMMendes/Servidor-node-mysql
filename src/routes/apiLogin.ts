@@ -36,5 +36,5 @@ router.post("/register", apiController.register);
 router.get("/refresh", refreshTokenController);
 router.post("/logout", logoutController);
 router.post("/userinfo", verifyJWT, apiController.userInfo);
-router.post("/upload", upload.single("avatar"), apiController.uploadAvatarImg);
+router.post("/upload", upload.single("file"), apiController.uploadAvatarImg);
 export default router;
