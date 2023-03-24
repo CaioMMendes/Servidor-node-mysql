@@ -1,3 +1,4 @@
+import { google } from "googleapis";
 import { Request, Response } from "express";
 import { loginUser } from "../models/login";
 import { unlink } from "fs/promises";
@@ -40,11 +41,14 @@ export const login = async function (req: Request, res: Response) {
           maxAge: 30 * 24 * 60 * 60 * 1000,
         });
       }
-
+      console.log("login", validate);
       res.json({
         name: validate.name,
         email: validate.email,
         token: accessToken,
+        googleId: validate.googleId,
+        avatarId: validate.avatarId,
+        picture: validate.picture,
       });
 
       return;
@@ -60,7 +64,9 @@ export const register = async function (req: Request, res: Response) {
   const email = req.body.email;
   const password = await bcrypt.hash(req.body.password, 10);
   const name = req.body.name;
-
+  const googleId = req.body.googleId;
+  const picture = req.body.picture;
+  console.log("googleId", googleId);
   const validate = await loginUser.findOne({
     where: {
       email,
@@ -76,6 +82,8 @@ export const register = async function (req: Request, res: Response) {
     email,
     password,
     name,
+    googleId,
+    picture,
   });
 
   //todo- insere um refresh token no banco quando o usuario é cadastrado
@@ -94,6 +102,7 @@ export const register = async function (req: Request, res: Response) {
 };
 
 export const userInfo = async (req: any, res: Response) => {
+  console.log("userinfo", req.body);
   let user: any = await loginUser.findOne({
     where: {
       //esse id sai da criptografia que eu coloquei no jwt ai quando ta certo o token retorna o id
@@ -101,7 +110,14 @@ export const userInfo = async (req: any, res: Response) => {
     },
   });
 
-  res.json(user);
+  res.json({
+    name: user.name,
+    email: user.email,
+    token: user.token,
+    googleId: user.googleId,
+    avatarId: user.avatarId,
+    picture: user.picture,
+  });
 };
 
 export const uploadAvatarImg = async (req: any, res: Response) => {
@@ -137,4 +153,56 @@ export const uploadAvatarImg = async (req: any, res: Response) => {
 
     res.json({ error: "Arquivo inválido" });
   }
+};
+
+export const googleLogin = async function (req: Request, res: Response) {
+  const email = req.body.email;
+  const googleId = req.body.googleId;
+  const isChecked = req.body.isChecked;
+  console.log(req.body);
+  const validate = await loginUser.findOne({
+    where: {
+      email,
+    },
+  });
+
+  if (validate) {
+    if (validate.googleId === googleId) {
+      console.log("entrou googleid");
+      const accessToken = jwt.sign(
+        { id: validate.id },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "15m" }
+      );
+      const refreshToken = jwt.sign(
+        { id: validate.id },
+        process.env.REFRESH_TOKEN_SECRET,
+        { expiresIn: "30d" }
+      );
+      await loginUser.update({ token: refreshToken }, { where: { email } });
+
+      if (isChecked) {
+        res.cookie("jwt", refreshToken, {
+          httpOnly: true,
+
+          // sameSite: "none",
+
+          // secure: false, //true para requisições de sites https
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+        });
+      }
+
+      res.json({
+        name: validate.name,
+        email: validate.email,
+        token: accessToken,
+        googleId: validate.googleId,
+        avatarId: validate.avatarId,
+      });
+
+      return;
+    } else {
+      res.status(418).json(false);
+    }
+  } else res.json({ redirect: true });
 };

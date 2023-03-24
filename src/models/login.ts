@@ -6,6 +6,10 @@ export interface loginUserInstance extends Model {
   email: string;
   password: string;
   name: string;
+  token: string;
+  googleId: string;
+  avatarId: string;
+  picture: string;
 }
 
 export const loginUser = sequelizeInstance.define<loginUserInstance>(
@@ -41,6 +45,9 @@ export const loginUser = sequelizeInstance.define<loginUserInstance>(
     avatarId: {
       type: DataTypes.STRING,
       unique: true,
+    },
+    picture: {
+      type: DataTypes.STRING,
     },
   },
   {

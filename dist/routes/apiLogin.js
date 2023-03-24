@@ -59,10 +59,11 @@ const upload = (0, multer_1.default)({
     limits: { fieldSize: 10485760, fileSize: 10485760 },
 });
 router.post("/login", apiController.login);
+router.post("/googleLogin", apiController.googleLogin);
 router.post("/register", apiController.register);
 router.get("/refresh", refreshTokenController_1.refreshTokenController);
 router.post("/logout", logoutController_1.logoutController);
 router.post("/userinfo", verifyJWT_1.verifyJWT, apiController.userInfo);
-router.post("/upload", upload.single("avatar"), apiController.uploadAvatarImg);
+router.post("/upload", upload.single("file"), apiController.uploadAvatarImg);
 exports.default = router;
 //# sourceMappingURL=apiLogin.js.map

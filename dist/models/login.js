@@ -35,6 +35,9 @@ exports.loginUser = Conexao_1.sequelizeInstance.define("loginUser", {
         type: sequelize_1.DataTypes.STRING,
         unique: true,
     },
+    picture: {
+        type: sequelize_1.DataTypes.STRING,
+    },
 }, {
     tableName: "login",
     timestamps: false,

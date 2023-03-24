@@ -32,6 +32,7 @@ const upload = multer({
   limits: { fieldSize: 10485760, fileSize: 10485760 },
 });
 router.post("/login", apiController.login);
+router.post("/googleLogin", apiController.googleLogin);
 router.post("/register", apiController.register);
 router.get("/refresh", refreshTokenController);
 router.post("/logout", logoutController);
