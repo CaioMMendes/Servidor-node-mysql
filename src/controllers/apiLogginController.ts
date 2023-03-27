@@ -11,6 +11,8 @@ export const login = async function (req: Request, res: Response) {
   const email = req.body.email;
   const password = req.body.password;
   const isChecked = req.body.isChecked;
+  const linkAccount = req.body.linkAccount;
+  const googleId = req.body.googleId;
   const validate = await loginUser.findOne({
     where: {
       email,
@@ -29,7 +31,14 @@ export const login = async function (req: Request, res: Response) {
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: "30d" }
       );
-      await loginUser.update({ token: refreshToken }, { where: { email } });
+      if (linkAccount === email) {
+        await loginUser.update(
+          { token: refreshToken, googleId: googleId },
+          { where: { email } }
+        );
+      } else {
+        await loginUser.update({ token: refreshToken }, { where: { email } });
+      }
 
       if (isChecked) {
         res.cookie("jwt", refreshToken, {
@@ -159,6 +168,7 @@ export const googleLogin = async function (req: Request, res: Response) {
   const email = req.body.email;
   const googleId = req.body.googleId;
   const isChecked = req.body.isChecked;
+
   console.log(req.body);
   const validate = await loginUser.findOne({
     where: {
@@ -202,7 +212,7 @@ export const googleLogin = async function (req: Request, res: Response) {
 
       return;
     } else {
-      res.status(418).json(false);
+      res.json({ email: validate.email, message: "Email já cadastrado" });
     }
   } else res.json({ redirect: true });
 };
