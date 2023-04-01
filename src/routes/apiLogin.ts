@@ -1,6 +1,6 @@
 import { verifyJWT } from "./../middleware/verifyJWT";
 import { Router } from "express";
-import * as apiController from "../controllers/apiLogginController";
+import * as apiController from "../controllers/apiLoginController";
 import { refreshTokenController } from "../controllers/refreshTokenController";
 import { logoutController } from "../controllers/logoutController";
 import multer from "multer";
@@ -32,6 +32,7 @@ const upload = multer({
   limits: { fieldSize: 10485760, fileSize: 10485760 },
 });
 router.post("/login", apiController.login);
+router.post("/recover-password", apiController.recoverPassword);
 router.post("/googleLogin", apiController.googleLogin);
 router.post("/register", apiController.register);
 router.get("/refresh", refreshTokenController);

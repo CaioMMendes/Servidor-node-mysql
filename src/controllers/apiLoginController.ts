@@ -2,10 +2,17 @@ import { google } from "googleapis";
 import { Request, Response } from "express";
 import { loginUser } from "../models/login";
 import { unlink } from "fs/promises";
-import { createFile, updateFile, deleteFile } from "../controllers/driveUpload";
+import { createFile, updateFile, deleteFile } from "./driveUpload";
+import { sendEmail } from "./sendEmail";
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+// sendEmail(
+//   "caio03mendes@gmail.com",
+//   "[MYCOMPANY] YOUR EMAIL VERIFICATION",
+//   "Hello. This email is for your email verification.",
+//   "<h1>Hello</h1>"
+// );
 
 export const login = async function (req: Request, res: Response) {
   const email = req.body.email;
@@ -13,6 +20,7 @@ export const login = async function (req: Request, res: Response) {
   const isChecked = req.body.isChecked;
   const linkAccount = req.body.linkAccount;
   const googleId = req.body.googleId;
+  const picture = req.body.picture;
   const validate = await loginUser.findOne({
     where: {
       email,
@@ -33,7 +41,7 @@ export const login = async function (req: Request, res: Response) {
       );
       if (linkAccount === email) {
         await loginUser.update(
-          { token: refreshToken, googleId: googleId },
+          { token: refreshToken, googleId: googleId, picture: picture },
           { where: { email } }
         );
       } else {
@@ -51,7 +59,7 @@ export const login = async function (req: Request, res: Response) {
         });
       }
       console.log("login", validate);
-      res.json({
+      return res.json({
         name: validate.name,
         email: validate.email,
         token: accessToken,
@@ -59,10 +67,8 @@ export const login = async function (req: Request, res: Response) {
         avatarId: validate.avatarId,
         picture: validate.picture,
       });
-
-      return;
     } else {
-      res.status(418).json(false);
+      return res.status(418).json(false);
     }
   } else res.status(418).json(false);
 };
@@ -107,7 +113,7 @@ export const register = async function (req: Request, res: Response) {
   //   { where: { id: results.id } }
   // );
 
-  res.json(results.id);
+  return res.json(results.id);
 };
 
 export const userInfo = async (req: any, res: Response) => {
@@ -208,6 +214,7 @@ export const googleLogin = async function (req: Request, res: Response) {
         token: accessToken,
         googleId: validate.googleId,
         avatarId: validate.avatarId,
+        picture: validate.picture,
       });
 
       return;
@@ -215,4 +222,21 @@ export const googleLogin = async function (req: Request, res: Response) {
       res.json({ email: validate.email, message: "Email já cadastrado" });
     }
   } else res.json({ redirect: true });
+};
+export const recoverPassword = async function (req: Request, res: Response) {
+  const email = req.body.email;
+
+  console.log(req.body);
+  const validate = await loginUser.findOne({
+    where: {
+      email,
+    },
+  });
+
+  if (validate) {
+    //todo envia o email
+    res.json({ message: email });
+    return;
+    // }
+  } else res.json({ message: "E-mail not found" });
 };

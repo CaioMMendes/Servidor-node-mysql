@@ -1,28 +1,24 @@
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
-
+import database from "./database";
 
 dotenv.config();
 
-
 export const sequelizeInstance = new Sequelize(
-  process.env.database as string,
-  process.env.user as string,
-  process.env.password as string,
+  database.database,
+  database.user,
+  database.password,
 
   {
     dialect: "mysql",
-    host: process.env.host as string,
+    host: database.host,
   }
 );
 export const createDBConnection = async (): Promise<any> => {
-
-
   try {
     await sequelizeInstance.authenticate();
-    console.log("deu certo");
+    return console.log("deu certo");
   } catch (error) {
     console.log("deu problema", error);
   }
-
 };
