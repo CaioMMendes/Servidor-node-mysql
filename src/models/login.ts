@@ -1,3 +1,4 @@
+import { timeStamp } from "console";
 import { Model, DataTypes } from "sequelize";
 import { sequelizeInstance } from "../database/Conexao";
 
@@ -10,6 +11,7 @@ export interface loginUserInstance extends Model {
   googleId: string;
   avatarId: string;
   picture: string;
+  expire: Date;
 }
 
 export const loginUser = sequelizeInstance.define<loginUserInstance>(
@@ -48,6 +50,9 @@ export const loginUser = sequelizeInstance.define<loginUserInstance>(
     },
     picture: {
       type: DataTypes.STRING,
+    },
+    expire: {
+      type: DataTypes.DATE,
     },
   },
   {

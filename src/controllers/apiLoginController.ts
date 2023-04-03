@@ -4,15 +4,10 @@ import { loginUser } from "../models/login";
 import { unlink } from "fs/promises";
 import { createFile, updateFile, deleteFile } from "./driveUpload";
 import { sendEmail } from "./sendEmail";
+// import  {Jwt}  from "jsonwebtoken";
 
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-// sendEmail(
-//   "caio03mendes@gmail.com",
-//   "[MYCOMPANY] YOUR EMAIL VERIFICATION",
-//   "Hello. This email is for your email verification.",
-//   "<h1>Hello</h1>"
-// );
 
 export const login = async function (req: Request, res: Response) {
   const email = req.body.email;
@@ -26,7 +21,23 @@ export const login = async function (req: Request, res: Response) {
       email,
     },
   });
-
+  if (validate?.expire) {
+    console.log(validate.expire);
+    const date = validate.expire;
+    date.setMinutes(date.getMinutes() + 15);
+    console.log(date);
+    if (new Date() < date) {
+      return res.json({ message: "Verifique o e-mail" });
+    } else {
+      await loginUser.destroy({
+        where: { email },
+      });
+      return res.json({
+        message:
+          "O seu email de confirmação expirou, cadastre novamente para efetuar o login",
+      });
+    }
+  }
   if (validate) {
     if (await bcrypt.compare(password, validate.password)) {
       const accessToken = jwt.sign(
@@ -68,7 +79,7 @@ export const login = async function (req: Request, res: Response) {
         picture: validate.picture,
       });
     } else {
-      return res.status(418).json(false);
+      return res.json({ invalidUserPassword: true });
     }
   } else res.status(418).json(false);
 };
@@ -81,13 +92,24 @@ export const register = async function (req: Request, res: Response) {
   const name = req.body.name;
   const googleId = req.body.googleId;
   const picture = req.body.picture;
+  // const date = req.body.date;
   console.log("googleId", googleId);
   const validate = await loginUser.findOne({
     where: {
       email,
     },
   });
-
+  if (
+    email == "" ||
+    email === null ||
+    email == undefined ||
+    name === undefined ||
+    name == "" ||
+    name === null
+  ) {
+    res.status(400);
+    return;
+  }
   if (validate) {
     res.status(418).json({ email: validate.email });
     return;
@@ -99,6 +121,7 @@ export const register = async function (req: Request, res: Response) {
     name,
     googleId,
     picture,
+    // date,
   });
 
   //todo- insere um refresh token no banco quando o usuario é cadastrado
@@ -112,6 +135,9 @@ export const register = async function (req: Request, res: Response) {
   //   { token: refreshToken },
   //   { where: { id: results.id } }
   // );
+  console.log("id do usuario criado", results.id);
+
+  sendEmail(results.id, "caio03mendes@gmail.com");
 
   return res.json(results.id);
 };
@@ -125,7 +151,7 @@ export const userInfo = async (req: any, res: Response) => {
     },
   });
 
-  res.json({
+  return res.json({
     name: user.name,
     email: user.email,
     token: user.token,
@@ -239,4 +265,10 @@ export const recoverPassword = async function (req: Request, res: Response) {
     return;
     // }
   } else res.json({ message: "E-mail not found" });
+};
+
+export const verificatedEmail = async function (req: any, res: Response) {
+  await loginUser.update({ expire: null }, { where: { id: req.id } });
+  //pega o usuario que tem o email e coloca null na aba de expire
+  res.redirect("http://localhost:5173/account/register/email-verificated");
 };

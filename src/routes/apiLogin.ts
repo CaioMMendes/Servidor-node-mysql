@@ -1,3 +1,4 @@
+import { verifyEmailToken } from "./../middleware/verifyEmailToken";
 import { verifyJWT } from "./../middleware/verifyJWT";
 import { Router } from "express";
 import * as apiController from "../controllers/apiLoginController";
@@ -39,4 +40,10 @@ router.get("/refresh", refreshTokenController);
 router.post("/logout", logoutController);
 router.post("/userinfo", verifyJWT, apiController.userInfo);
 router.post("/upload", upload.single("file"), apiController.uploadAvatarImg);
+router.get(
+  "/:randomBites/verify/:emailToken",
+  verifyEmailToken,
+  apiController.verificatedEmail
+);
+
 export default router;
