@@ -40,6 +40,7 @@ router.get("/refresh", refreshTokenController);
 router.post("/logout", logoutController);
 router.post("/userinfo", verifyJWT, apiController.userInfo);
 router.post("/upload", upload.single("file"), apiController.uploadAvatarImg);
+router.post("/update-user-info", verifyJWT, apiController.updateUserInfo);
 router.get(
   "/:randomBites/verify/:emailToken",
   verifyEmailToken,

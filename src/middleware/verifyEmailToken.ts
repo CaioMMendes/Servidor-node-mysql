@@ -12,7 +12,6 @@ export const verifyEmailToken = (
   next: NextFunction
 ) => {
   const urlString = req.protocol + "://" + req.get("host") + req.originalUrl;
-  console.log("entrou no verify email token", urlString);
 
   const urlPath = new URL(urlString).pathname;
   console.log(urlPath);

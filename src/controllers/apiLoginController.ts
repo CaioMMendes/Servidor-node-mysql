@@ -124,8 +124,6 @@ export const register = async function (req: Request, res: Response) {
     // date,
   });
 
-  //todo- insere um refresh token no banco quando o usuario é cadastrado
-  //todo- deixei comentando porque acho melhor só cadastrar esse token quando a pessoa logar a primeira vez
   // const refreshToken = jwt.sign(
   //   { id: results.id },
   //   process.env.REFRESH_TOKEN_SECRET,
@@ -136,7 +134,7 @@ export const register = async function (req: Request, res: Response) {
   //   { where: { id: results.id } }
   // );
   console.log("id do usuario criado", results.id);
-
+  //todo substituir o caio03mendes@gmail.com por email, para enviar pro email da pessoa
   sendEmail(results.id, "caio03mendes@gmail.com");
 
   return res.json(results.id);
@@ -270,5 +268,23 @@ export const recoverPassword = async function (req: Request, res: Response) {
 export const verificatedEmail = async function (req: any, res: Response) {
   await loginUser.update({ expire: null }, { where: { id: req.id } });
   //pega o usuario que tem o email e coloca null na aba de expire
-  res.redirect("http://localhost:5173/account/register/email-verificated");
+  res.redirect("http://localhost:5173/account/login");
+};
+
+export const updateUserInfo = async function (req: any, res: Response) {
+  console.log("update user info");
+  const name = req.body.name;
+  const email = req.body.email;
+  const password = req.body.password;
+  console.log(req.id);
+  console.log(req.body);
+  const updateUserInfo: any = await loginUser.update(
+    {
+      name,
+      email,
+    },
+    // { where: { id: 122 } }
+    { where: { id: req.id } }
+  );
+  return res.json({ name: updateUserInfo.name, email: updateUserInfo.email });
 };
