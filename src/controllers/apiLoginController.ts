@@ -1,4 +1,5 @@
 import { google } from "googleapis";
+
 import { Request, Response } from "express";
 import { loginUser } from "../models/login";
 import { unlink } from "fs/promises";
@@ -9,7 +10,7 @@ import { sendEmail } from "./sendEmail";
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
-export const login = async function (req: Request, res: Response) {
+export const login = async function (req: Request, res: any) {
   const email = req.body.email;
   const password = req.body.password;
   const isChecked = req.body.isChecked;
@@ -88,10 +89,12 @@ export const register = async function (req: Request, res: Response) {
   //  let results:any=await   sequelizeInstance.query(`delete from produtos where nome='cadeira'`)
 
   const email = req.body.email;
+
   const password = await bcrypt.hash(req.body.password, 10);
   const name = req.body.name;
   const googleId = req.body.googleId;
   const picture = req.body.picture;
+  let results;
   // const date = req.body.date;
   console.log("googleId", googleId);
   const validate = await loginUser.findOne({
@@ -114,15 +117,26 @@ export const register = async function (req: Request, res: Response) {
     res.status(418).json({ email: validate.email });
     return;
   }
-
-  const results = await loginUser.create({
-    email,
-    password,
-    name,
-    googleId,
-    picture,
-    // date,
-  });
+  if (googleId) {
+    results = await loginUser.create({
+      email,
+      password,
+      name,
+      googleId,
+      picture,
+      expire: null,
+      // date,
+    });
+  } else {
+    results = await loginUser.create({
+      email,
+      password,
+      name,
+      googleId,
+      picture,
+      // date,
+    });
+  }
 
   // const refreshToken = jwt.sign(
   //   { id: results.id },
@@ -133,9 +147,13 @@ export const register = async function (req: Request, res: Response) {
   //   { token: refreshToken },
   //   { where: { id: results.id } }
   // );
+  console.log(googleId);
+  if (googleId === null) {
+    console.log("nullo");
+    //todo substituir o caio03mendes@gmail.com por email, para enviar pro email da pessoa
+    sendEmail(results.id, "caio03mendes@gmail.com");
+  }
   console.log("id do usuario criado", results.id);
-  //todo substituir o caio03mendes@gmail.com por email, para enviar pro email da pessoa
-  sendEmail(results.id, "caio03mendes@gmail.com");
 
   return res.json(results.id);
 };
@@ -148,15 +166,16 @@ export const userInfo = async (req: any, res: Response) => {
       id: req.id,
     },
   });
-
-  return res.json({
-    name: user.name,
-    email: user.email,
-    token: user.token,
-    googleId: user.googleId,
-    avatarId: user.avatarId,
-    picture: user.picture,
-  });
+  if (user) {
+    return res.json({
+      name: user.name,
+      email: user.email,
+      token: user.token,
+      googleId: user.googleId,
+      avatarId: user.avatarId,
+      picture: user.picture,
+    });
+  }
 };
 
 export const uploadAvatarImg = async (req: any, res: Response) => {
@@ -193,8 +212,77 @@ export const uploadAvatarImg = async (req: any, res: Response) => {
     res.json({ error: "Arquivo inválido" });
   }
 };
+export const updateUserImg = async (req: any, res: Response) => {
+  console.log("entrou no update user img");
+  console.log(req.id);
+  console.log(req.body);
+  console.log(req.file);
+  if (req.file) {
+    console.log(req.file);
+    const userId = req.id;
+    console.log("id é:", req.id);
+    let imageId = "";
 
-export const googleLogin = async function (req: Request, res: Response) {
+    //todo create file
+    // await createFile(req.file).then((data: any) => {
+    //   console.log(data);
+
+    //   imageId = data.id;
+    // });
+    //todo
+
+    // await deleteFile("18_ZuYgt3Z5MKaGAUAlBJjm809BgLvcW2");
+    // await updateFile("1a-g9YCzQC1-TBznCFhVcNBfgxjVyFt5b", req.file.path);
+
+    //       async function loadData(){
+    //       const [products,categories]=Promise.allSettled([loadProducts(),loadCategories()])
+    //       return{products,categories}
+    //     }
+    // const [updateImageDb, findUserDb] = await Promise.allSettled([
+    //   loginUser.update(
+    //     {
+    //       avatarId: imageId,
+    //     },
+    //     // { where: { id: 122 } }
+    //     { where: { id: userId } }
+    //   ),
+    //   loginUser.findOne(
+    //     // { where: { id: 122 } }
+    //     { where: { id: userId } }
+    //   ),
+    // ]);
+    const findUserDb: any = await loginUser.findOne({
+      where: { id: userId },
+    });
+    console.log(imageId);
+    //Para deletar o arquivo usa o unlink
+    if (findUserDb && findUserDb.avatarId != null) {
+      await updateFile(findUserDb.avatarId, req.file.path);
+      imageId = findUserDb.avatarId;
+    } else {
+      await createFile(req.file).then((data: any) => {
+        imageId = data.id;
+      });
+
+      await loginUser.update(
+        {
+          avatarId: imageId,
+        },
+        // { where: { id: 122 } }
+        { where: { id: userId } }
+      );
+    }
+    await unlink(req.file.path);
+    console.log(imageId);
+    return res.json({ avatarId: imageId });
+  } else {
+    res.status(400);
+
+    return res.json({ error: "Arquivo inválido" });
+  }
+};
+
+export const googleLogin = async function (req: Request, res: any) {
   const email = req.body.email;
   const googleId = req.body.googleId;
   const isChecked = req.body.isChecked;
@@ -265,7 +353,7 @@ export const recoverPassword = async function (req: Request, res: Response) {
   } else res.json({ message: "E-mail not found" });
 };
 
-export const verificatedEmail = async function (req: any, res: Response) {
+export const verificatedEmail = async function (req: any, res: any) {
   await loginUser.update({ expire: null }, { where: { id: req.id } });
   //pega o usuario que tem o email e coloca null na aba de expire
   res.redirect("http://localhost:5173/account/login");
@@ -276,8 +364,7 @@ export const updateUserInfo = async function (req: any, res: Response) {
   const name = req.body.name;
   const email = req.body.email;
   const password = req.body.password;
-  console.log(req.id);
-  console.log(req.body);
+
   const updateUserInfo: any = await loginUser.update(
     {
       name,
@@ -286,5 +373,50 @@ export const updateUserInfo = async function (req: any, res: Response) {
     // { where: { id: 122 } }
     { where: { id: req.id } }
   );
-  return res.json({ name: updateUserInfo.name, email: updateUserInfo.email });
+  const user: any = await loginUser.findOne({
+    where: {
+      id: req.id,
+    },
+  });
+
+  return res.json({
+    name: user.name,
+    email: user.email,
+  });
+};
+
+export const removeUserImg = async function (req: any, res: Response) {
+  const user: any = await loginUser.findOne({
+    where: {
+      id: req.id,
+    },
+  });
+
+  await deleteFile(user.avatarId);
+
+  const updateUserInfo: any = await loginUser.update(
+    {
+      avatarId: null,
+    },
+    // { where: { id: 122 } }
+    { where: { id: req.id } }
+  );
+
+  return res.sendStatus(200);
+};
+
+export const deleteUserAccount = async function (req: any, res: Response) {
+  await loginUser.destroy(
+    // { where: { id: 122 } }
+    { where: { id: req.id } }
+  );
+  res.clearCookie("jwt", {
+    httpOnly: true,
+
+    // sameSite: "none",
+
+    // secure: true,
+  });
+
+  return res.sendStatus(200);
 };

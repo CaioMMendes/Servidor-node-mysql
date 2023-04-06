@@ -1,7 +1,7 @@
 import { google } from "googleapis";
 import { drive_v3 } from "googleapis/build/src/apis/drive";
 const fs = require("fs");
-import * as dotenv from "dotenv";
+import dotenv from "dotenv";
 dotenv.config();
 
 // interface googleCredentials {

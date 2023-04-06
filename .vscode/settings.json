@@ -1,0 +1,7 @@
+// {
+//   "terminal.integrated.shell.windows": "C:\\Program Files\\myShell\\bin\\myShell.exe"
+// }
+
+{
+  "terminal.integrated.automationShell.windows": "C:\\Program Files\\Git\\bin\\bash.exe"
+}
