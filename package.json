@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "set NODE_ENV=test& jest --runInBand",
-    "dev": "nodemon -e ts,json,mustache src/Server.ts",
+    "dev": "nodemon -e ts,json src/Server.ts",
     "w": "tsc -w"
   },
   "author": "Caio",

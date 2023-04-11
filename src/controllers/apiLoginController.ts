@@ -251,6 +251,21 @@ export const updateUserImg = async (req: any, res: Response) => {
     //     { where: { id: userId } }
     //   ),
     // ]);
+
+    //     //todo não vai dar certo porque teria que saber o avatarid antigo para excluir depois
+    //  await createFile(req.file).then((data: any) => {
+    //    imageId = data.id;
+    //  });
+
+    //    await loginUser.update(
+    //      {
+    //        avatarId: imageId,
+    //      },
+    //      // { where: { id: 122 } }
+    //      { where: { id: userId } }
+    //    );
+
+    //     //todo
     const findUserDb: any = await loginUser.findOne({
       where: { id: userId },
     });
@@ -364,7 +379,24 @@ export const updateUserInfo = async function (req: any, res: Response) {
   const name = req.body.name;
   const email = req.body.email;
   const password = req.body.password;
-
+  const newPassword = req.body.newPassword;
+  const newPasswordConfirm = req.body.newPasswordConfirm;
+  if (newPassword !== newPasswordConfirm) {
+    return res.sendStatus(403);
+  }
+  console.table({
+    name,
+    email,
+    password,
+    newPassword,
+    newPasswordConfirm,
+  });
+  const user: any = await loginUser.findOne({
+    where: {
+      id: req.id,
+    },
+  });
+  // console.log("user aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", user);
   const updateUserInfo: any = await loginUser.update(
     {
       name,
@@ -373,16 +405,17 @@ export const updateUserInfo = async function (req: any, res: Response) {
     // { where: { id: 122 } }
     { where: { id: req.id } }
   );
-  const user: any = await loginUser.findOne({
-    where: {
-      id: req.id,
-    },
-  });
-
+  //todo ta retornando o name e o email que chega porque eu precisei usar o findone antes
+  //todo do update pra pegar a senha pra verificar se ta certa, e quando pega antes ele não
+  //todo atualiza, ai estaria enviando o nome e e-mail anteriores
   return res.json({
-    name: user.name,
-    email: user.email,
+    name: name,
+    email: email,
   });
+  // return res.json({
+  //   name: user.name,
+  //   email: user.email,
+  // });
 };
 
 export const removeUserImg = async function (req: any, res: Response) {
@@ -391,16 +424,26 @@ export const removeUserImg = async function (req: any, res: Response) {
       id: req.id,
     },
   });
-
-  await deleteFile(user.avatarId);
-
-  const updateUserInfo: any = await loginUser.update(
-    {
-      avatarId: null,
-    },
-    // { where: { id: 122 } }
-    { where: { id: req.id } }
-  );
+  if (user.avatarId) {
+    await deleteFile(user.avatarId);
+    const updateUserInfo: any = await loginUser.update(
+      {
+        avatarId: null,
+        picture: null,
+      },
+      // { where: { id: 122 } }
+      { where: { id: req.id } }
+    );
+  }
+  if (user.picture && user.avatarId === null) {
+    const updateUserInfo: any = await loginUser.update(
+      {
+        picture: null,
+      },
+      // { where: { id: 122 } }
+      { where: { id: req.id } }
+    );
+  }
 
   return res.sendStatus(200);
 };
