@@ -89,11 +89,13 @@ export const register = async function (req: Request, res: Response) {
   //  let results:any=await   sequelizeInstance.query(`delete from produtos where nome='cadeira'`)
 
   const email = req.body.email;
-
+  const logado = req.body.logado;
   const password = await bcrypt.hash(req.body.password, 10);
   const name = req.body.name;
   const googleId = req.body.googleId;
   const picture = req.body.picture;
+  console.log("logado", logado);
+  console.log("googleId", googleId);
   let results;
   // const date = req.body.date;
   console.log("googleId", googleId);
@@ -148,7 +150,7 @@ export const register = async function (req: Request, res: Response) {
   //   { where: { id: results.id } }
   // );
   console.log(googleId);
-  if (googleId === null) {
+  if (googleId === null || googleId === undefined) {
     console.log("nullo");
     //todo substituir o caio03mendes@gmail.com por email, para enviar pro email da pessoa
     sendEmail(results.id, "caio03mendes@gmail.com");
@@ -271,6 +273,7 @@ export const updateUserImg = async (req: any, res: Response) => {
     });
     console.log(imageId);
     //Para deletar o arquivo usa o unlink
+
     if (findUserDb && findUserDb.avatarId != null) {
       await updateFile(findUserDb.avatarId, req.file.path);
       imageId = findUserDb.avatarId;
@@ -381,6 +384,7 @@ export const updateUserInfo = async function (req: any, res: Response) {
   const password = req.body.password;
   const newPassword = req.body.newPassword;
   const newPasswordConfirm = req.body.newPasswordConfirm;
+
   if (newPassword !== newPasswordConfirm) {
     return res.sendStatus(403);
   }
@@ -396,15 +400,40 @@ export const updateUserInfo = async function (req: any, res: Response) {
       id: req.id,
     },
   });
+  if (password !== "") {
+    if (await bcrypt.compare(password, user.password)) {
+      const hashPassword = await bcrypt.hash(newPassword, 10);
+      const updateUserInfo: any = await loginUser.update(
+        {
+          name,
+          email,
+          password: hashPassword,
+        },
+        // { where: { id: 122 } }
+        { where: { id: req.id } }
+      );
+      return res.json({
+        name: name,
+        email: email,
+      });
+    } else {
+      return res.json({ error: "Senha incorreta" });
+    }
+  }
+  //todo comparar a senha usando bcrypt, se for diferente retornar erro 403 e mensagem
+  //todo se for igual mudar a senha no banco de dados, colocar hash antes
   // console.log("user aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", user);
-  const updateUserInfo: any = await loginUser.update(
-    {
-      name,
-      email,
-    },
-    // { where: { id: 122 } }
-    { where: { id: req.id } }
-  );
+  if (name !== user.name || email !== user.email) {
+    const updateUserInfo: any = await loginUser.update(
+      {
+        name,
+        email,
+      },
+      // { where: { id: 122 } }
+      { where: { id: req.id } }
+    );
+  }
+
   //todo ta retornando o name e o email que chega porque eu precisei usar o findone antes
   //todo do update pra pegar a senha pra verificar se ta certa, e quando pega antes ele não
   //todo atualiza, ai estaria enviando o nome e e-mail anteriores

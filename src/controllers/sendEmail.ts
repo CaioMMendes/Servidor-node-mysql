@@ -29,8 +29,24 @@ export const sendEmail = async (id: number, email: any) => {
       from: process.env.EMAIL_USER,
       to: email,
       subject: "Email Verification",
-      text: `click here to verificate ${url}`,
-      html: `<h1>click here to verificate ${url} </h1>`,
+      // text: `click here to verificate ${url}`,
+      html: `<!DOCTYPE html>
+        <html>
+        <head>
+            <title>Exemplo de email estilizado</title>
+            <style>
+                h1 {
+                    color: blue;
+                    font-size: 24px;
+                }
+            </style>
+        </head>
+        <body>
+            <h1>Olá, Fulano!</h1>
+            <p>Este é um exemplo de email estilizado.</p>
+            <a href=${url} target="_blank"><button>Clique aqui</button></a>
+        </body>
+        </html>`,
     });
     console.log("Email sent successfully");
   } catch (error) {
