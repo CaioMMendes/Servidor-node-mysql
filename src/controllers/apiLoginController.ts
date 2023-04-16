@@ -4,7 +4,10 @@ import { Request, Response } from "express";
 import { loginUser } from "../models/login";
 import { unlink } from "fs/promises";
 import { createFile, updateFile, deleteFile } from "./driveUpload";
-import { sendEmail } from "./sendEmail";
+import {
+  sendVerificationEmail,
+  sendSucessfulVerificationEmail,
+} from "./sendEmail";
 // import  {Jwt}  from "jsonwebtoken";
 
 const jwt = require("jsonwebtoken");
@@ -153,7 +156,7 @@ export const register = async function (req: Request, res: Response) {
   if (googleId === null || googleId === undefined) {
     console.log("nullo");
     //todo substituir o caio03mendes@gmail.com por email, para enviar pro email da pessoa
-    sendEmail(results.id, "caio03mendes@gmail.com");
+    await sendVerificationEmail(results.id, "caio03mendes@gmail.com", name);
   }
   console.log("id do usuario criado", results.id);
 
@@ -269,9 +272,11 @@ export const updateUserImg = async (req: any, res: Response) => {
 
     //     //todo
     const findUserDb: any = await loginUser.findOne({
+      // attributes: { exclude: ["name"] },
       where: { id: userId },
     });
     console.log(imageId);
+    console.log("usuariooooooooooo", findUserDb);
     //Para deletar o arquivo usa o unlink
 
     if (findUserDb && findUserDb.avatarId != null) {
@@ -374,6 +379,7 @@ export const recoverPassword = async function (req: Request, res: Response) {
 export const verificatedEmail = async function (req: any, res: any) {
   await loginUser.update({ expire: null }, { where: { id: req.id } });
   //pega o usuario que tem o email e coloca null na aba de expire
+  await sendSucessfulVerificationEmail(req.id, "caio03mendes@gmail.com");
   res.redirect("http://localhost:5173/account/login");
 };
 
