@@ -11,6 +11,7 @@ export const sequelizeInstance = new Sequelize(database.uri!, {
   dialectOptions: {
     ssl: {
       require: true,
+      rejectUnauthorized: false,
     },
   },
 });
@@ -18,6 +19,8 @@ export const sequelizeInstance = new Sequelize(database.uri!, {
 export const createDBConnection = async (): Promise<any> => {
   try {
     await sequelizeInstance.authenticate();
+    // await sequelizeInstance.sync({ force: true });
+    // console.log("All models were synchronized successfully.");
     return console.log("Conexão com banco de dados bem sucedida");
   } catch (error) {
     console.log("Ocorreu um erro ", error);

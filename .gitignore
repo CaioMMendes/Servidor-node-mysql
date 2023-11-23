@@ -2,5 +2,11 @@ node_modules
 .env
 googleDrive.json
 dist/
+*/config
+node_modules
+config
 dist-ssr
 dist
+node/config
+config/config.json
+migrations
