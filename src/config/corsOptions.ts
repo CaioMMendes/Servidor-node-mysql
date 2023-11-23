@@ -8,6 +8,9 @@ export const corsOptions = {
     "http://localhost:5176",
     "http://localhost:5177",
     "http://localhost:5178",
+    "https://aprendendo-react-delta.vercel.app/",
+    "https://aprendendo-react-git-main-caiommendes.vercel.app/",
+    "https://aprendendo-react-aksj10ll2-caiommendes.vercel.app/",
   ],
 
   optionsSucessStatus: 200,
