@@ -1,4 +1,4 @@
-import { Produtos } from "./models/produtos";
+// import { Produtos } from "./models/produtos";
 import express, { Request, Response, ErrorRequestHandler } from "express";
 import { createDBConnection } from "./database/Conexao";
 import { Fornecedor_produto } from "./models/fornecedor_produto";
@@ -47,15 +47,15 @@ app.use(fornecedor);
 //   }
 // };
 // app.use(errorHandler);
-router.post("/mata-cadeira", async function (req, res) {
-  //  let results:any=await   sequelizeInstance.query(`delete from produtos where nome='cadeira'`)
-  let results: any = await Produtos.destroy({
-    where: {
-      nome: "cadeira",
-    },
-  });
-  res.status(200).json(results);
-});
+// router.post("/mata-cadeira", async function (req, res) {
+//   //  let results:any=await   sequelizeInstance.query(`delete from produtos where nome='cadeira'`)
+//   let results: any = await Produtos.destroy({
+//     where: {
+//       nome: "cadeira",
+//     },
+//   });
+//   res.status(200).json(results);
+// });
 export default app;
 
 //request dados de cookie, ip essas coisas
