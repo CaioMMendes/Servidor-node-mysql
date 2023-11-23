@@ -31,9 +31,15 @@ dotenv.config();
 // };
 
 const auth = new google.auth.GoogleAuth({
-  //   keyFile: `${keyFile}`,
-  //   credentials: credentials,
-  keyFile: "./googleDrive.json",
+  // keyFile: "./googleDrive.json",
+  credentials: {
+    client_email: process.env.CLIENT_EMAIL,
+    client_id: process.env.CLIENT_ID,
+    type: process.env.TYPE!,
+    private_key: process.env.PRIVATE_KEY!.replace(/\n/g, "\n"),
+    // universe_domain: process.env.UNIVERSE_DOMAIN ,
+  },
+  projectId: process.env.PROJECT_ID,
   scopes: ["https://www.googleapis.com/auth/drive"],
 });
 

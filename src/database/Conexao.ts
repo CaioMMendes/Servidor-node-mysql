@@ -1,24 +1,25 @@
 import { Sequelize } from "sequelize";
 import dotenv from "dotenv";
 import database from "./database";
+import * as pg from "pg";
 
 dotenv.config();
 
-export const sequelizeInstance = new Sequelize(
-  database.database,
-  database.user,
-  database.password,
+export const sequelizeInstance = new Sequelize(database.uri!, {
+  dialect: "postgres",
+  dialectModule: pg,
+  dialectOptions: {
+    ssl: {
+      require: true,
+    },
+  },
+});
 
-  {
-    dialect: "mysql",
-    host: database.host,
-  }
-);
 export const createDBConnection = async (): Promise<any> => {
   try {
     await sequelizeInstance.authenticate();
-    return console.log("deu certo");
+    return console.log("Conexão com banco de dados bem sucedida");
   } catch (error) {
-    console.log("deu problema", error);
+    console.log("Ocorreu um erro ", error);
   }
 };

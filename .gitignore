@@ -1,3 +1,6 @@
 node_modules
 .env
 googleDrive.json
+dist/
+dist-ssr
+dist
