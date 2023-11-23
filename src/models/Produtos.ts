@@ -1,10 +1,6 @@
-import { timeStamp } from "console";
-import sequelize from "sequelize";
-import { Model, DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import { sequelizeInstance } from "../database/Conexao";
 import { FornecedorInstance } from "./fornecedores";
-import { Fornecedores } from "./fornecedores";
-import { Fornecedor_produto } from "./fornecedor_produto";
 
 export interface ProdutosInstance extends Model {
   addFornecedores(fornecedores: FornecedorInstance): any;

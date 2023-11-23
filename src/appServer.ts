@@ -1,18 +1,14 @@
 // import { Produtos } from "./models/produtos";
-import express, { Request, Response, ErrorRequestHandler } from "express";
-import { createDBConnection } from "./database/Conexao";
-import { Fornecedor_produto } from "./models/fornecedor_produto";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
-import { MulterError } from "multer";
+import express from "express";
 import { corsOptions } from "./config/corsOptions";
+import { createDBConnection } from "./database/Conexao";
 import { credentials } from "./middleware/credentials";
+import { Fornecedor_produto } from "./models/fornecedor_produto";
 import apiLogin from "./routes/apiLogin";
 import endereco from "./routes/endereco";
-import produtos from "./routes/apiProdutos";
-import fornecedor from "./routes/fornecedor";
 
-import { nextTick } from "process";
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
