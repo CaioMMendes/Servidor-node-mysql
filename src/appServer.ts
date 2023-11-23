@@ -5,7 +5,7 @@ import express from "express";
 import { corsOptions } from "./config/corsOptions";
 import { createDBConnection } from "./database/Conexao";
 import { credentials } from "./middleware/credentials";
-import { Fornecedor_produto } from "./models/fornecedor_produto";
+// import { Fornecedor_produto } from "./models/fornecedor_produto";
 import apiLogin from "./routes/apiLogin";
 import endereco from "./routes/endereco";
 
@@ -26,7 +26,7 @@ app.use(
   })
 );
 
-Fornecedor_produto.length; //É só pra inicializar esse arquivo, se quiser fazer sem isso copiar o final belongtomany para o arquivo de Produtos
+// Fornecedor_produto.length; //É só pra inicializar esse arquivo, se quiser fazer sem isso copiar o final belongtomany para o arquivo de Produtos
 app.use(cors(corsOptions));
 app.use("/", router);
 app.use(apiLogin);
