@@ -11,6 +11,9 @@ export const corsOptions = {
     "https://aprendendo-react-delta.vercel.app/",
     "https://aprendendo-react-git-main-caiommendes.vercel.app/",
     "https://aprendendo-react-aksj10ll2-caiommendes.vercel.app/",
+    "https://aprendendo-react-delta.vercel.app",
+    "https://aprendendo-react-git-main-caiommendes.vercel.app",
+    "https://aprendendo-react-aksj10ll2-caiommendes.vercel.app",
   ],
 
   optionsSucessStatus: 200,
