@@ -34,9 +34,9 @@ Fornecedor_produto.length; //É só pra inicializar esse arquivo, se quiser faze
 app.use(cors(corsOptions));
 app.use("/", router);
 app.use(apiLogin);
-app.use(produtos);
+// app.use(produtos);
 app.use(endereco);
-app.use(fornecedor);
+// app.use(fornecedor);
 // const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
 //   res.status(400);
 //   if (err instanceof MulterError) {
